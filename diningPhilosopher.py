@@ -2,11 +2,9 @@ import threading
 import random
 import time
 
-#inheriting threading class in Thread module
 class Philosopher(threading.Thread):
-    running = True  #used to check if everyone is finished eating
+    running = True 
 
- #Since the subclass overrides the constructor, it must make sure to invoke the base class constructor (Thread.__init__()) before doing anything else to the thread.
     def __init__(self, index, forkOnLeft, forkOnRight):
         threading.Thread.__init__(self)
         self.index = index
@@ -15,25 +13,22 @@ class Philosopher(threading.Thread):
 
     def run(self):
         while(self.running):
-            # Philosopher is thinking (but really is sleeping).
             time.sleep(30)
             print ('Philosopher %s is hungry.' % self.index)
             self.dine()
 
     def dine(self):
-        # if both the semaphores(forks) are free, then philosopher will eat
         fork1, fork2 = self.forkOnLeft, self.forkOnRight
         while self.running:
-            fork1.acquire() # wait operation on left fork
+            fork1.acquire() 
             locked = fork2.acquire(False) 
-            if locked: break #if right fork is not available leave left fork
+            if locked: break
             fork1.release()
             print ('Philosopher %s swaps forks.' % self.index)
             fork1, fork2 = fork2, fork1
         else:
             return
         self.dining()
-        #release both the fork after dining
         fork2.release()
         fork1.release()
  
@@ -43,9 +38,7 @@ class Philosopher(threading.Thread):
         print ('Philosopher %s finishes eating and leaves to think.' % self.index)
 
 def main():
-    forks = [threading.Semaphore() for n in range(5)] #initialising array of semaphore i.e forks
-
-    #here (i+1)%5 is used to get right and left forks circularly between 1-5
+    forks = [threading.Semaphore() for n in range(5)]
     philosophers= [Philosopher(i, forks[i%5], forks[(i+1)%5])
             for i in range(5)]
 
